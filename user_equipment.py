@@ -12,7 +12,7 @@ class user_equipment(object):
         self.bs = bs
         self.s = 0      # sub-carrier idx
         self.tx_power = self.set_power()
-        self.computing_power = user_equipment.computing_capacity[randint(0, 2)]
+        self.computing_power = user_equipment.computing_capacity[randint(0, 2)] * 10**9
     
     @staticmethod
     def pathloss(dist):
@@ -23,7 +23,6 @@ class user_equipment(object):
         db_ps = user_equipment.pathloss(self.bs.dist_from_user(self))
 
         dbm_result_power = dbm_tx_power - db_ps
-        print(dbm_result_power)
 
         return 10**(dbm_result_power/10)
 
@@ -42,8 +41,24 @@ class user_equipment(object):
     def data_rate(self):
         return SUBCARRIER_BANDWIDTH * log2(1 + self.SINR())
     
-    def task_completion_time(self):
+    def local_task_completion_time(self):
         return BETA/self.computing_power
     
-    def energy_consumption(self):
-        return BETA*self.computing_capacity**2
+    def local_energy_consumption(self):
+        return KAPA*BETA*self.computing_power**2
+    
+    def local_computation_overhead(self):
+        return LAMBDA*self.local_task_completion_time() + LAMBDA*self.local_energy_consumption()
+    
+    def remote_uplink_transmission_time(self):
+        return ALPHA/self.data_rate()
+    
+    def remote_execution_time(self):
+        return BETA/F_N
+    
+    def remote_energy_consumption(self):
+        return UE_TX_POWER/AMPLIFIER * self.remote_uplink_transmission_time()
+    
+    def remote_computation_overhead(self):
+        return LAMBDA*(self.remote_uplink_transmission_time() + self.remote_execution_time()) + LAMBDA*(self.remote_energy_consumption())
+    
