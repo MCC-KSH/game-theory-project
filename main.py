@@ -12,7 +12,7 @@ def simulation():
             x = random.random() * 1000
             y = random.random() * 1000
             if RANGE_NO_DEPLOY < ((bs.x - x)**2 + (bs.y - y)**2)**0.5 < RANGE_BS_COMM:
-                ue = user_equipment(x, y)
+                ue = user_equipment(x, y, bs)
                 bs.append_user(ue)
                 break
     
@@ -21,7 +21,7 @@ def simulation():
     print("=======")
     for ue in bs.list_user:
         print(ue)
-        print(ue.x, ue.y)
+        print(ue.x, ue.y, bs.dist_from_user(ue), ue.SINR(), ue.data_rate())
 
 if __name__ == "__main__":
     simulation()
