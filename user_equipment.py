@@ -1,2 +1,6 @@
+from params import *
+
 class user_equipment(object):
-    pass
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
