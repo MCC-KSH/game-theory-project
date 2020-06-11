@@ -8,7 +8,11 @@ class base_station(object):
         self.list_user = []
         self.coalitions = [[] for _ in range(NUMBER_OF_UE + NUMBER_OF_SUBCARRIER)]
         self.computation_overhead = [0 for _ in range(NUMBER_OF_UE + NUMBER_OF_SUBCARRIER)]
-    
+
+    def reset(self):
+        self.coalitions = [[] for _ in range(NUMBER_OF_UE + NUMBER_OF_SUBCARRIER)]
+        self.computation_overhead = [0 for _ in range(NUMBER_OF_UE + NUMBER_OF_SUBCARRIER)]
+
     def append_user(self, user):
         self.list_user.append(user)
 
@@ -16,12 +20,19 @@ class base_station(object):
         return ((self.x - user.x)**2 + (self.y - user.y)**2)**0.5
     
     def utility_coalition(self, idx):
+        if idx >= NUMBER_OF_SUBCARRIER:
+            sum_overhead = 0
+            for ue in self.coalitions[idx]:
+                sum_overhead += ue.local_computation_overhead()
+            self.computation_overhead[idx] = sum_overhead
+            return 0
         sum_overhead = 0
+        sum_utility = 0
         for ue in self.coalitions[idx]:
-            sum_overhead -= ue.remote_computation_overhead()
-            sum_overhead += ue.local_computation_overhead()
+            sum_overhead += ue.remote_computation_overhead()
+            sum_utility += ue.remote_computation_overhead() - ue.local_computation_overhead()
         self.computation_overhead[idx] = sum_overhead
-        return sum_overhead
+        return sum_utility
         
         
     def preference(self, ue, coalition):

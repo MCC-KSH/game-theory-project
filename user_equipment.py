@@ -13,7 +13,7 @@ class user_equipment(object):
         self.bs = bs
         self.s = 0      # sub-carrier idx
         self.tx_power = self.set_power()
-        self.computing_power = user_equipment.computing_capacity[randint(0, 2)] * 10**9
+        self.computing_power = user_equipment.computing_capacity[randint(0, len(user_equipment.computing_capacity)-1)] * 10**9
     
     @staticmethod
     def pathloss(dist):

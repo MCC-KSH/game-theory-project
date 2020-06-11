@@ -7,7 +7,7 @@ RANGE_NO_DEPLOY = 200
 MAX_VAL = 1e13
 
 # UE
-NUMBER_OF_UE = 10
+NUMBER_OF_UE = 5
 UE_TX_POWER = 100                  # 100 mW
 TX_POWER = 100                  # 100 dBm
 AMPLIFIER = 15
