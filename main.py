@@ -31,23 +31,22 @@ def simulation():
     for ue in bs.list_user:
         bs.coalitions[ue.s].append(ue)
 
-
-    # # TODO coalition game based algorithm
-    # for idx in range(NUMBER_OF_SUBCARRIER + NUMBER_OF_UE):
-    #     bs.utility_coalition(idx)
+    
+    
+    # Proposed Algorithm
     cnt_conv = 0
     while True:
         idx_ue = randint(0, NUMBER_OF_UE-1)
         ue = bs.list_user[idx_ue]
         idx_coalition = _
         while True:
-            idx_coalition = randint(0, NUMBER_OF_SUBCARRIER-1)
-            if ue.s == idx_coalition:
+            idx_coalition = randint(-1, NUMBER_OF_SUBCARRIER-1)
+            if idx_coalition == -1:
+                idx_coalition = NUMBER_OF_SUBCARRIER + ue.id
+            if ue.s != idx_coalition:
                 break
         if bs.preference(ue, idx_coalition):
             bs.move(ue, idx_coalition)
-            if bs.preference(ue, NUMBER_OF_SUBCARRIER + ue.id):
-                bs.move(ue, NUMBER_OF_SUBCARRIER + ue.id)
             cnt_conv = 0
         else:
             cnt_conv += 1
