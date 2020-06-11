@@ -6,15 +6,17 @@ from user_equipment import *
 
 def simulation():
     bs = base_station(X_CENTER, Y_CENTER)
+    ue_id = 0
     for _ in range(NUMBER_OF_UE):
         x, y = _, _
         while True:
             x = random() * 1000
             y = random() * 1000
             if RANGE_NO_DEPLOY < ((bs.x - x)**2 + (bs.y - y)**2)**0.5 < RANGE_BS_COMM:
-                ue = user_equipment(x, y, bs)
-                ue.s = randint(0, NUMBER_OF_SUBCARRIER-1)   # TODO this is random method
+                ue = user_equipment(ue_id, x, y, bs)
+                ue.s = randint(0, NUMBER_OF_SUBCARRIER-1)
                 bs.append_user(ue)
+                ue_id += 1
                 break
     
     print(bs)
@@ -29,12 +31,39 @@ def simulation():
     for ue in bs.list_user:
         bs.coalitions[ue.s].append(ue)
 
-    # TODO coalition game based algorithm
-    for idx in range(NUMBER_OF_SUBCARRIER + NUMBER_OF_UE):
-        bs.computation_offloading(idx)
 
-    for overhead in bs.computation_overhead:
-        print(overhead)
+    # # TODO coalition game based algorithm
+    # for idx in range(NUMBER_OF_SUBCARRIER + NUMBER_OF_UE):
+    #     bs.utility_coalition(idx)
+    cnt_conv = 0
+    while True:
+        idx_ue = randint(0, NUMBER_OF_UE-1)
+        ue = bs.list_user[idx_ue]
+        idx_coalition = _
+        while True:
+            idx_coalition = randint(0, NUMBER_OF_SUBCARRIER-1)
+            if ue.s == idx_coalition:
+                break
+        if bs.preference(ue, idx_coalition):
+            bs.move(ue, idx_coalition)
+            if bs.preference(ue, NUMBER_OF_SUBCARRIER + ue.id):
+                bs.move(ue, NUMBER_OF_SUBCARRIER + ue.id)
+            cnt_conv = 0
+        else:
+            cnt_conv += 1
+        
+        for idx in range(NUMBER_OF_SUBCARRIER + NUMBER_OF_UE):
+            bs.utility_coalition(idx)
+        
+        if cnt_conv == MAX_CNT:
+            break
+
+    for i in range(NUMBER_OF_SUBCARRIER):
+        print(bs.computation_overhead[i], end=" ")
+    print()
+    for i in range(NUMBER_OF_UE):
+        print(bs.computation_overhead[NUMBER_OF_SUBCARRIER + i], end=" ")
+    print()
 
 if __name__ == "__main__":
     simulation()

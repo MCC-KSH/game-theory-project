@@ -6,7 +6,8 @@ from base_station import *
 
 class user_equipment(object):
     computing_capacity = [0.5, 0.8, 1.0]
-    def __init__(self, x, y, bs):
+    def __init__(self, id, x, y, bs):
+        self.id = id
         self.x = x
         self.y = y
         self.bs = bs
