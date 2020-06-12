@@ -1,3 +1,6 @@
+N_EX = 50
+MAX_ITERATION = 10**5
+
 n0 = 0.1
 
 # BS

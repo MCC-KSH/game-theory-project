@@ -4,7 +4,8 @@ from params import *
 from base_station import *
 from user_equipment import *
 
-def simulation():
+def simulation(filename):
+    print("EXPERIMENTS", filename[9:-22], "START")
     bs_params = [NUMBER_OF_UE, NUMBER_OF_SUBCARRIER]
     ue_params = [TX_POWER, UE_TX_POWER, AMPLIFIER, n0, SUBCARRIER_BANDWIDTH, ALPHA, BETA, KAPA, LAMBDA, F_N]
     
@@ -45,6 +46,7 @@ def simulation():
     for i in range(NUMBER_OF_SUBCARRIER + NUMBER_OF_UE):
         LCO_result[2] += bs.utility_coalition(i)
 
+    print("LCO DONE")
     # COO
     bs.reset()
     for i in range(len(bs.list_user)):
@@ -89,12 +91,16 @@ def simulation():
         
         if cnt_conv == MAX_CNT:
             break
+        
+        if COO_result[4] == MAX_ITERATION:
+            break
     
     COO_result[0] = sum(bs.computation_overhead)
     COO_result[1] = bs.computation_overhead[NUMBER_OF_SUBCARRIER:].count(0) / NUMBER_OF_UE
     for i in range(NUMBER_OF_SUBCARRIER + NUMBER_OF_UE):
         COO_result[2] += bs.utility_coalition(i)
 
+    print("COO DONE")
     # HOO
     bs.reset()
     for i in range(len(bs.list_user)):
@@ -169,12 +175,16 @@ def simulation():
         
         if cnt_conv == MAX_CNT:
             break
+        
+        if HOO_result[4] == MAX_ITERATION:
+            break
 
     HOO_result[0] = sum(bs.computation_overhead)
     HOO_result[1] = bs.computation_overhead[NUMBER_OF_SUBCARRIER:].count(0) / NUMBER_OF_UE
     for i in range(NUMBER_OF_SUBCARRIER + NUMBER_OF_UE):
         HOO_result[2] += bs.utility_coalition(i)
 
+    print("HOO DONE")
     # Proposed Algorithm
     bs.reset()
     for i in range(len(bs.list_user)):
@@ -235,12 +245,16 @@ def simulation():
         
         if cnt_conv == MAX_CNT:
             break
+        
+        if PRO_result[4] == MAX_ITERATION:
+            break
 
     PRO_result[0] = sum(bs.computation_overhead)
     PRO_result[1] = bs.computation_overhead[NUMBER_OF_SUBCARRIER:].count(0) / NUMBER_OF_UE
     for i in range(NUMBER_OF_SUBCARRIER + NUMBER_OF_UE):
         PRO_result[2] += bs.utility_coalition(i)
 
+    print("PRO DONE")
     # GOO
     channel_stat = []
 
@@ -278,15 +292,69 @@ def simulation():
     GOO_result[1] = bs.computation_overhead[NUMBER_OF_SUBCARRIER:].count(0) / NUMBER_OF_UE
     for i in range(NUMBER_OF_SUBCARRIER + NUMBER_OF_UE):
         GOO_result[2] += bs.utility_coalition(i)
+    print("GOO DONE")
 
-    print(" ".join(str(data) for data in LCO_result))
-    print(" ".join(str(data) for data in COO_result))
-    print(" ".join(str(data) for data in HOO_result))
-    print(" ".join(str(data) for data in PRO_result))
-    print(" ".join(str(data) for data in GOO_result))
+    LCO_data = "\t".join(str(data) for data in LCO_result)
+    COO_data = "\t".join(str(data) for data in COO_result)
+    HOO_data = "\t".join(str(data) for data in HOO_result)
+    PRO_data = "\t".join(str(data) for data in PRO_result)
+    GOO_data = "\t".join(str(data) for data in GOO_result)
+
+    f = open(filename, 'a')
+    f.write(LCO_data + "\t")
+    f.write(COO_data + "\t")
+    f.write(HOO_data + "\t")
+    f.write(PRO_data + "\t")
+    f.write(GOO_data + "\t")
+    f.write('\n')
+    f.close()
 
 if __name__ == "__main__":
-    global NUMBER_OF_UE, NUMBER_OF_SUBCARRIER, TX_POWER, UE_TX_POWER
-    NUMBER_OF_UE = 300
-    NUMBER_OF_SUBCARRIER = 15
-    simulation()
+    global NUMBER_OF_UE, NUMBER_OF_SUBCARRIER, UE_TX_POWER, F_N
+
+    list_NUMBER_OF_UE = [100, 150, 200, 250, 300]
+    list_NUMBER_OF_SUBCARRIER = [10, 15, 20, 25, 30]
+    list_UE_TX_POWER = [50, 100, 150, 200, 250, 300]
+    list_F_N = [0.5*10**9, 1.0*10**9, 1.5*10**9, 2.0*10**9, 2.5*10**9, 3.0*10**9]
+
+    default_NUMBER_OF_UE = 200
+    default_NUMBER_OF_SUBCARRIER = 20
+    default_UE_TX_POWER = 100
+    defualt_F_N = 1.0*10**9
+
+    for _ in range(N_EX):
+        for _NUMBER_OF_UE in list_NUMBER_OF_UE:
+            NUMBER_OF_UE = _NUMBER_OF_UE
+            NUMBER_OF_SUBCARRIER = default_NUMBER_OF_SUBCARRIER
+            UE_TX_POWER = default_UE_TX_POWER
+            F_N = defualt_F_N
+            
+            filename = "./result/[" + str(NUMBER_OF_UE) + "][" + str(NUMBER_OF_SUBCARRIER) + "][" + str(UE_TX_POWER) + "][" + str(F_N) + "] simulation_result.txt"
+            simulation(filename)
+
+        for _NUMBER_OF_SUBCARRIER in list_NUMBER_OF_SUBCARRIER:
+            NUMBER_OF_UE = default_NUMBER_OF_UE
+            NUMBER_OF_SUBCARRIER = _NUMBER_OF_SUBCARRIER
+            UE_TX_POWER = default_UE_TX_POWER
+            F_N = defualt_F_N
+            
+            filename = "./result/[" + str(NUMBER_OF_UE) + "][" + str(NUMBER_OF_SUBCARRIER) + "][" + str(UE_TX_POWER) + "][" + str(F_N) + "] simulation_result.txt"
+            simulation(filename)
+
+        for _UE_TX_POWER in list_UE_TX_POWER:
+            NUMBER_OF_UE = default_NUMBER_OF_UE
+            NUMBER_OF_SUBCARRIER = default_NUMBER_OF_SUBCARRIER
+            UE_TX_POWER = _UE_TX_POWER
+            F_N = defualt_F_N
+            
+            filename = "./result/[" + str(NUMBER_OF_UE) + "][" + str(NUMBER_OF_SUBCARRIER) + "][" + str(UE_TX_POWER) + "][" + str(F_N) + "] simulation_result.txt"
+            simulation(filename)
+
+        for _F_N in list_F_N:
+            NUMBER_OF_UE = default_NUMBER_OF_UE
+            NUMBER_OF_SUBCARRIER = default_NUMBER_OF_SUBCARRIER
+            UE_TX_POWER = default_UE_TX_POWER
+            F_N = _F_N
+            
+            filename = "./result/[" + str(NUMBER_OF_UE) + "][" + str(NUMBER_OF_SUBCARRIER) + "][" + str(UE_TX_POWER) + "][" + str(F_N) + "] simulation_result.txt"
+            simulation(filename)
