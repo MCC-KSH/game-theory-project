@@ -1,17 +1,18 @@
-from params import *
 from user_equipment import *
 
 class base_station(object):
-    def __init__(self, x, y):
+    def __init__(self, x, y, params):
+        self.NUMBER_OF_UE = params[0]
+        self.NUMBER_OF_SUBCARRIER = params[1]
         self.x = x
         self.y = y
         self.list_user = []
-        self.coalitions = [[] for _ in range(NUMBER_OF_UE + NUMBER_OF_SUBCARRIER)]
-        self.computation_overhead = [0 for _ in range(NUMBER_OF_UE + NUMBER_OF_SUBCARRIER)]
+        self.coalitions = [[] for _ in range(self.NUMBER_OF_UE + self.NUMBER_OF_SUBCARRIER)]
+        self.computation_overhead = [0 for _ in range(self.NUMBER_OF_UE + self.NUMBER_OF_SUBCARRIER)]
 
     def reset(self):
-        self.coalitions = [[] for _ in range(NUMBER_OF_UE + NUMBER_OF_SUBCARRIER)]
-        self.computation_overhead = [0 for _ in range(NUMBER_OF_UE + NUMBER_OF_SUBCARRIER)]
+        self.coalitions = [[] for _ in range(self.NUMBER_OF_UE + self.NUMBER_OF_SUBCARRIER)]
+        self.computation_overhead = [0 for _ in range(self.NUMBER_OF_UE + self.NUMBER_OF_SUBCARRIER)]
 
     def append_user(self, user):
         self.list_user.append(user)
@@ -20,7 +21,7 @@ class base_station(object):
         return ((self.x - user.x)**2 + (self.y - user.y)**2)**0.5
     
     def utility_coalition(self, idx):
-        if idx >= NUMBER_OF_SUBCARRIER:
+        if idx >= self.NUMBER_OF_SUBCARRIER:
             sum_overhead = 0
             for ue in self.coalitions[idx]:
                 sum_overhead += ue.local_computation_overhead()
@@ -30,7 +31,7 @@ class base_station(object):
         sum_utility = 0
         for ue in self.coalitions[idx]:
             sum_overhead += ue.remote_computation_overhead()
-            sum_utility += ue.remote_computation_overhead() - ue.local_computation_overhead()
+            sum_utility += ue.local_computation_overhead() - ue.remote_computation_overhead()
         self.computation_overhead[idx] = sum_overhead
         return sum_utility
         
@@ -54,6 +55,7 @@ class base_station(object):
 
         if utility_k < 0 or utility_s < 0 or utility_k_n < 0 or utility_s_n < 0:
             return False
+        
         return utility_s_n + utility_k < utility_s + utility_k_n
     
     def move(self, ue, coalition):
